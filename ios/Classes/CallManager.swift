@@ -19,7 +19,13 @@ class CallManager: NSObject {
     func setSharedProvider(_ sharedProvider: CXProvider) {
         self.sharedProvider = sharedProvider
     }
-    
+
+    func outgoingCallConnected(_ data: Data) {
+        let uuid = UUID(uuidString: data.uuid)
+        self.sharedProvider?.reportOutgoingCall(with: uuid!, connectedAt: Date())
+        print("outgoingCallConnected successfully: \(data.uuid)")
+    }
+
     func startCall(_ data: Data) {
         let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
         let uuid = UUID(uuidString: data.uuid)
@@ -38,6 +44,7 @@ class CallManager: NSObject {
             callUpdate.hasVideo = data.type > 0 ? true : false
             callUpdate.localizedCallerName = data.nameCaller
             self.sharedProvider?.reportCall(with: uuid!, updated: callUpdate)
+            self.sharedProvider?.reportOutgoingCall(with: uuid!, startedConnectingAt: Date())
         })
     }
     

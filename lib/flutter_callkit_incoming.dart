@@ -48,6 +48,13 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("showMissCallNotification", params.toJson());
   }
 
+  /// set an Outgoing call connected.
+  /// On iOS, make Callkit connected.
+  /// On Android, Nothing.
+  static Future outgoingCallConnected(CallKitParams params) async {
+    await _channel.invokeMethod("outgoingCallConnected", params.toJson());
+  }
+
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).

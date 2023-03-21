@@ -80,6 +80,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "showMissCallNotification":
             result("OK")
             break
+        case "outgoingCallConnected":
+            print("outgoingCallConnected was called")
+            guard let args = call.arguments else {
+                result("OK")
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                self.callManager?.outgoingCallConnected(self.data!)
+            }
+            result("OK")
+            break
         case "startCall":
             guard let args = call.arguments else {
                 result("OK")
