@@ -103,7 +103,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             }
             if let getArgs = args as? [String: Any] {
                 self.data = Data(args: getArgs)
-                self.callManager?.outgoingCallConnected(self.data!)
+                self.callManager.outgoingCallConnected(self.data!)
             }
             result("OK")
             break
