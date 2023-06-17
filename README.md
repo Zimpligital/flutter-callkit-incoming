@@ -3,6 +3,7 @@
 A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Callkit for iOS).
 
 [![pub package](https://img.shields.io/pub/v/flutter_callkit_incoming.svg)](https://pub.dev/packages/flutter_callkit_incoming)
+[![pub points](https://img.shields.io/pub/points/flutter_callkit_incoming?label=pub%20points)](https://pub.dev/packages/flutter_callkit_incoming/score)
 [![Build Status](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml/badge.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml)
 
 <a href="https://www.buymeacoffee.com/hiennguyen92" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
@@ -263,6 +264,10 @@ A Flutter plugin to show incoming call in your Flutter app(Custom for Android/Ca
       info["type"] = 1
       //... set more data
       SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
+      
+      //please make sure call `completion()` at the end of the pushRegistry(......, completion: @escaping () -> Void)
+      // or `DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { completion() }`
+      // if you don't call completion() in pushRegistry(......, completion: @escaping () -> Void), there may be app crash by system when receiving voIP
     ```
     
     ```kotlin
