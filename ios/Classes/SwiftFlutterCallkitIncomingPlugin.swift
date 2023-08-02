@@ -482,10 +482,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
-            action.fulfill()
         }
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+
+        let microphonePermissionStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+        if (microphonePermissionStatus != .authorized) {
+            let now = Date()
+            let futureDate = now.addingTimeInterval(86400)
+            action.fulfill(withDateConnected: futureDate)
+        }
+        action.fulfill()
+        
     }
     
     
