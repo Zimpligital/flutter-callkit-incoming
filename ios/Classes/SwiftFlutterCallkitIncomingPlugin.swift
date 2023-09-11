@@ -36,6 +36,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var data: Data?
     private var isFromPushKit: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
+    private var audioPlayer: AVAudioPlayer?
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         streamHandlers.reap().forEach { handler in
@@ -97,6 +98,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "outgoingCallConnected":
             print("outgoingCallConnected was called")
+            stopAudioPlayer()
             guard let args = call.arguments else {
                 result("OK")
                 return
@@ -401,7 +403,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if data?.configureAudioSession != false {
             let session = AVAudioSession.sharedInstance()
             do{
-                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [.duckOthers,.allowBluetooth])
+                try session.setCategory(AVAudioSession.Category.playAndRecord, options: [.mixWithOthers,.allowBluetooth])
                 try session.setMode(self.getAudioSessionMode(data?.audioSessionMode))
                 try session.setActive(data?.audioSessionActive ?? true)
                 try session.setPreferredSampleRate(data?.audioSessionPreferredSampleRate ?? 44100.0)
@@ -449,6 +451,60 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         return mode
     }
     
+    func prepareAudioSession() -> Void {
+//        do {
+//            let session = AVAudioSession.sharedInstance()
+//            try session.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.voiceChat, options: [.mixWithOthers,.allowBluetooth])
+//            try session.setActive(true)
+//
+//        } catch {
+//            print("Issue with Audio Session prepareAudioSession")
+//        }
+    }
+
+
+    func prepareAudioPlayer() -> Void {
+
+        let audioFileName = "dialing"
+        let audioFileExtension = "mp3"
+
+        guard let filePath = Bundle.main.path(forResource: audioFileName, ofType: audioFileExtension) else {
+            print("Audio file not found at specified path")
+            return
+        }
+
+        let alertSound = URL(fileURLWithPath: filePath)
+        try? audioPlayer = AVAudioPlayer(contentsOf: alertSound)
+        audioPlayer?.prepareToPlay()
+    }
+
+
+    func playAudioPlayer() -> Void {
+        audioPlayer?.volume = 1.0
+        audioPlayer?.numberOfLoops = -1
+        audioPlayer?.play()
+    }
+
+
+    func pauseAudioPlayer() -> Void {
+        if audioPlayer?.isPlaying ?? false {
+            audioPlayer?.pause()
+        }
+    }
+
+
+    func stopAudioPlayer() -> Void {
+        if audioPlayer?.isPlaying ?? false {
+            audioPlayer?.stop()
+        }
+    }
+
+    func resetAudioPlayer() -> Void {
+        stopAudioPlayer()
+        audioPlayer?.currentTime = 0
+        playAudioPlayer()
+    }
+    
     public func providerDidReset(_ provider: CXProvider) {
         for call in self.callManager.calls {
             call.endCall()
@@ -462,6 +518,10 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         configurAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectData)
+            if (self?.data?.dialingEnable ?? false) {
+                self?.prepareAudioPlayer()
+                self?.resetAudioPlayer()
+            }
         }
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
@@ -481,6 +541,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.configurAudioSession()
         }
         call.hasConnectDidChange = { [weak self] in
+            self?.stopAudioPlayer()
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
         }
         self.answerCall = call
@@ -498,6 +559,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+        stopAudioPlayer()
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
             if(self.answerCall == nil && self.outgoingCall == nil){
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())

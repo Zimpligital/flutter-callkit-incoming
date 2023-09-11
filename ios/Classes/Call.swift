@@ -149,6 +149,7 @@ public class Call: NSObject {
     @objc public var includesCallsInRecents: Bool
     @objc public var ringtonePath: String
     @objc public var configureAudioSession: Bool
+    @objc public var dialingEnable: Bool
     @objc public var audioSessionMode: String
     @objc public var audioSessionActive: Bool
     @objc public var audioSessionPreferredSampleRate: Double
@@ -179,6 +180,7 @@ public class Call: NSObject {
         self.audioSessionActive = true
         self.audioSessionPreferredSampleRate = 44100.0
         self.audioSessionPreferredIOBufferDuration = 0.005
+        self.dialingEnable = false
     }
     
     @objc public convenience init(args: NSDictionary) {
@@ -199,7 +201,6 @@ public class Call: NSObject {
         self.duration = args["duration"] as? Int ?? 30000
         self.extra = args["extra"] as? NSDictionary ?? [:]
         
-        
         if let ios = args["ios"] as? [String: Any] {
             self.iconName = ios["iconName"] as? String ?? "CallKitLogo"
             self.handleType = ios["handleType"] as? String ?? ""
@@ -217,6 +218,7 @@ public class Call: NSObject {
             self.audioSessionActive = ios["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = ios["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
             self.audioSessionPreferredIOBufferDuration = ios["audioSessionPreferredIOBufferDuration"] as? Double ?? 0.005
+            self.dialingEnable = ios["dialingEnable"] as? Bool ?? false
         }else {
             self.iconName = args["iconName"] as? String ?? "CallKitLogo"
             self.handleType = args["handleType"] as? String ?? ""
@@ -234,6 +236,7 @@ public class Call: NSObject {
             self.audioSessionActive = args["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = args["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
             self.audioSessionPreferredIOBufferDuration = args["audioSessionPreferredIOBufferDuration"] as? Double ?? 0.005
+            self.dialingEnable = args["dialingEnable"] as? Bool ?? false
         }
     }
     
@@ -254,7 +257,8 @@ public class Call: NSObject {
             "audioSessionMode": audioSessionMode,
             "audioSessionActive": audioSessionActive,
             "audioSessionPreferredSampleRate": audioSessionPreferredSampleRate,
-            "audioSessionPreferredIOBufferDuration": audioSessionPreferredIOBufferDuration
+            "audioSessionPreferredIOBufferDuration": audioSessionPreferredIOBufferDuration,
+            "dialingEnable": dialingEnable
         ]
         let map: [String : Any] = [
             "uuid": uuid,

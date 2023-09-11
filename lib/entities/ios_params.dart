@@ -22,6 +22,7 @@ class IOSParams {
   final bool? supportsHolding;
   final bool? supportsGrouping;
   final bool? supportsUngrouping;
+  final bool? dialingEnable;
 
   /// Add file to root project xcode /ios/Runner/Ringtone.caf and Copy Bundle Resources(Build Phases) -> value: "Ringtone.caf"
   final String? ringtonePath;
@@ -42,6 +43,7 @@ class IOSParams {
     this.supportsGrouping,
     this.supportsUngrouping,
     this.ringtonePath,
+    this.dialingEnable
   });
 
   factory IOSParams.fromJson(Map<String, dynamic> json) =>
