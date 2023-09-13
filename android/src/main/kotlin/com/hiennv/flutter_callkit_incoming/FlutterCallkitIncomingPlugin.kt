@@ -59,22 +59,24 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             initSharedInstance(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
         }
 
-        fun initSharedInstance(context: Context, binaryMessenger: BinaryMessenger) {
+        fun initSharedInstance(context: Context, binaryMessenger: BinaryMessenger?) {
             if (!::instance.isInitialized) {
                 instance = FlutterCallkitIncomingPlugin()
                 instance.callkitNotificationManager = CallkitNotificationManager(context)
                 instance.context = context
             }
 
-            val channel = MethodChannel(binaryMessenger, "flutter_callkit_incoming")
-            methodChannels[binaryMessenger] = channel
-            channel.setMethodCallHandler(instance)
+            if (binaryMessenger != null) {
+                val channel = MethodChannel(binaryMessenger, "flutter_callkit_incoming")
+                methodChannels[binaryMessenger] = channel
+                channel.setMethodCallHandler(instance)
 
-            val events = EventChannel(binaryMessenger, "flutter_callkit_incoming_events")
-            eventChannels[binaryMessenger] = events
-            val handler = EventCallbackHandler()
-            eventHandlers.add(WeakReference(handler))
-            events.setStreamHandler(handler)
+                val events = EventChannel(binaryMessenger, "flutter_callkit_incoming_events")
+                eventChannels[binaryMessenger] = events
+                val handler = EventCallbackHandler()
+                eventHandlers.add(WeakReference(handler))
+                events.setStreamHandler(handler)
+            }
         }
     }
 
