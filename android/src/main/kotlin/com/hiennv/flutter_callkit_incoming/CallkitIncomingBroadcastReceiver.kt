@@ -60,6 +60,16 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 action = "${context.packageName}.${CallkitConstants.ACTION_CALL_CALLBACK}"
                 putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
             }
+
+        fun getIntentCustom(context: Context, data: Bundle?) =
+            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
+                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_CUSTOM}"
+                putExtra(CallkitConstants.ACTION_CALL_CUSTOM, data)
+            }
+
+        fun getStartCallDurationIntent(context: Context): Intent {
+            return Intent("${context.packageName}.${CallkitIncomingActivity.ACTION_START_CALL_DURATION}")
+        }
     }
 
 
@@ -96,7 +106,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data, true)
+                    val isFullScreen = data.getBoolean("fullScreen")
+                    callkitNotificationManager.acceptIncomingNotification(data, isFullScreen)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
@@ -104,10 +115,21 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
             "${context.packageName}.${CallkitConstants.ACTION_CALL_DECLINE}" -> {
                 try {
+                    data.putBoolean("isAlreadyPostCancel", true);
                     sendEventFlutter(CallkitConstants.ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
+                    try {
+                        var extra =
+                            data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
+                        val userToken = extra.getValue("userToken") as String
+                        val cancelEndpoint = extra.getValue("cancelEndpoint") as String
+                        AppUtils.postApiWithoutBody(cancelEndpoint, userToken)
+                    } catch (e: Exception) {
+
+                    }
+                    CallkitIncomingActivity().onDeclineClick()
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -118,6 +140,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data, false)
                     removeCall(context, Data.fromBundle(data))
+                    CallkitIncomingActivity().onDeclineClick()
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
                 }
@@ -146,18 +169,32 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     Log.e(TAG, null, error)
                 }
             }
+            "${context.packageName}.${CallkitConstants.ACTION_CALL_CUSTOM}" -> {
+                try {
+                    Log.d("native", ": send flutter event ACTION_CALL_CUSTOM ${data.toString()}")
+                    sendEventFlutter(CallkitConstants.ACTION_CALL_CUSTOM, data)
+                } catch (error: Exception) {
+                    Log.e(TAG, null, error)
+                }
+            }
         }
     }
 
     private fun sendEventFlutter(event: String, data: Bundle) {
         val android = mapOf(
-            "isCustomNotification" to data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false),
+            "isCustomNotification" to data.getBoolean(
+                CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
+                false
+            ),
             "isCustomSmallExNotification" to data.getBoolean(
                 CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION,
                 false
             ),
             "ringtonePath" to data.getString(CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH, ""),
-            "backgroundColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR, ""),
+            "backgroundColor" to data.getString(
+                CallkitConstants.EXTRA_CALLKIT_BACKGROUND_COLOR,
+                ""
+            ),
             "backgroundUrl" to data.getString(CallkitConstants.EXTRA_CALLKIT_BACKGROUND_URL, ""),
             "actionColor" to data.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, ""),
             "incomingCallNotificationChannelName" to data.getString(

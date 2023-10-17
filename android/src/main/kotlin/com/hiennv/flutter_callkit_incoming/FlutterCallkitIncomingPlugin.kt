@@ -207,6 +207,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
                 "callConnected" -> {
+                    context?.sendBroadcast(
+                        CallkitIncomingBroadcastReceiver.getStartCallDurationIntent(
+                            requireNotNull(context),
+                        )
+                    )
                     result.success("OK")
                 }
                 "endAllCalls" -> {

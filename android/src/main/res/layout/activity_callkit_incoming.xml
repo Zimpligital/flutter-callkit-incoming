@@ -25,7 +25,7 @@
         <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
             android:id="@+id/llBackgroundAnimation"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/base_margin_revert_x5"
             android:layout_weight="1"
             android:fitsSystemWindows="false">
@@ -36,11 +36,13 @@
                 android:layout_height="@dimen/base_margin_x2_5"
                 android:layout_above="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
-                android:adjustViewBounds="true"
-                android:visibility="invisible"
-                android:scaleType="fitCenter"
                 android:layout_marginBottom="@dimen/base_margin_x5"
+                android:adjustViewBounds="true"
+                android:alpha="0.5"
+                android:paddingRight="@dimen/base_margin_x2"
+                android:scaleType="fitEnd"
                 android:src="@drawable/ic_logo"
+                android:visibility="visible"
                 tools:ignore="ContentDescription" />
 
 
@@ -55,7 +57,7 @@
 
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
@@ -94,6 +96,12 @@
                     android:textSize="@dimen/size_text_action"
                     tools:text="Some info" />
 
+                <Chronometer
+                    android:id="@+id/tvDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:targetApi="24" />
+
             </LinearLayout>
 
         </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
@@ -105,96 +113,226 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:id="@+id/llAction"
+            android:id="@+id/llActionParent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="0dp"
-            android:fitsSystemWindows="true"
-            android:orientation="horizontal">
+            android:layout_weight="0"
+            android:orientation="vertical"
+            android:padding="@dimen/base_margin_x1_5">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/llActionCtl"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="0dp"
+                android:divider="@drawable/transparent"
+                android:orientation="horizontal"
+                android:padding="@dimen/base_margin"
+                android:showDividers="middle"
+                android:visibility="gone">
 
-                <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
-                    app:ripple_amount="4"
-                    app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
+                <LinearLayout
+                    android:id="@+id/llMic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/ivDeclineCall"
+                        android:id="@+id/ivMic"
                         android:layout_width="@dimen/size_button"
                         android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_decline"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_decline"
-                        tools:ignore="ContentDescription" />
+                        android:background="@drawable/bg_action_circle"
+                        android:padding="@dimen/call_action_v2"
+                        app:srcCompat="@drawable/ic_mic_on" />
 
                     <TextView
-                        android:id="@+id/tvDecline"
+                        android:id="@+id/tvMic"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/ivDeclineCall"
-                        android:layout_marginBottom="@dimen/base_margin"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="@string/text_decline"
-                        android:textColor="@color/action_text"
-                        android:textSize="@dimen/size_text_action" />
+                        android:text="Mute" />
+                </LinearLayout>
 
-                </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+                <LinearLayout
+                    android:id="@+id/llSpeaker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivSpeaker"
+                        android:layout_width="@dimen/size_button"
+                        android:layout_height="@dimen/size_button"
+                        android:background="@drawable/bg_action_circle"
+                        android:padding="@dimen/call_action_v2"
+                        tools:srcCompat="@drawable/ic_speaker_volume_down" />
+
+                    <TextView
+                        android:id="@+id/tvSpeaker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Speaker" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivVideo"
+                        android:layout_width="@dimen/size_button"
+                        android:layout_height="@dimen/size_button"
+                        android:background="@drawable/bg_action_circle"
+                        android:padding="@dimen/call_action_v1"
+                        app:srcCompat="@drawable/ic_video_on" />
+
+                    <TextView
+                        android:id="@+id/tvVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Video" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llUChat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivUChat"
+                        android:layout_width="@dimen/size_button"
+                        android:layout_height="@dimen/size_button"
+                        android:background="@drawable/bg_action_circle"
+                        android:cropToPadding="false"
+                        app:srcCompat="@drawable/ic_logo_without_text" />
+
+                    <TextView
+                        android:id="@+id/tvUChat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="UChat" />
+                </LinearLayout>
 
             </LinearLayout>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/llAction"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="0dp"
+                android:fitsSystemWindows="true"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/loDecline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
+                        android:id="@+id/llDeclineAnimation"
+                        android:layout_width="@dimen/size_button_x2_5"
+                        android:layout_height="@dimen/size_button_x2_5"
+                        android:layout_gravity="center"
+                        app:ripple_amount="4"
+                        app:ripple_radius="@dimen/base_margin_x1_5"
+                        app:ripple_scale="4.5">
+
+                        <ImageView
+                            android:id="@+id/ivDeclineCall"
+                            android:layout_width="@dimen/size_button"
+                            android:layout_height="@dimen/size_button"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/bg_button_decline"
+                            android:padding="@dimen/base_margin_x1_5"
+                            android:src="@drawable/ic_decline"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/tvDecline"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/ivDeclineCall"
+                            android:layout_marginBottom="@dimen/base_margin"
+                            android:gravity="center"
+                            android:text="@string/text_decline"
+                            android:textColor="@color/action_text"
+                            android:textSize="@dimen/size_text_action" />
+
+                    </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+
+                </LinearLayout>
+
+                <Space
+                    android:id="@+id/atSpace"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="visible"
+                    tools:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/loAccept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    tools:ignore="UseCompoundDrawables">
 
 
-                <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-                    android:layout_width="@dimen/size_button_x2_5"
-                    android:layout_height="@dimen/size_button_x2_5"
-                    app:ripple_amount="4"
-                    app:ripple_radius="@dimen/base_margin_x1_5"
-                    app:ripple_scale="4.5">
+                    <com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
+                        android:layout_width="@dimen/size_button_x2_5"
+                        android:layout_height="@dimen/size_button_x2_5"
+                        android:visibility="visible"
+                        app:ripple_amount="4"
+                        app:ripple_radius="@dimen/base_margin_x1_5"
+                        app:ripple_scale="4.5">
 
 
-                    <ImageView
-                        android:id="@+id/ivAcceptCall"
-                        android:layout_width="@dimen/size_button"
-                        android:layout_height="@dimen/size_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/bg_button_accept"
-                        android:padding="@dimen/base_margin_x1_5"
-                        android:src="@drawable/ic_accept"
-                        tools:ignore="ContentDescription" />
+                        <ImageView
+                            android:id="@+id/ivAcceptCall"
+                            android:layout_width="@dimen/size_button"
+                            android:layout_height="@dimen/size_button"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/bg_button_accept"
+                            android:padding="@dimen/base_margin_x1_5"
+                            android:src="@drawable/ic_accept"
+                            tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/tvAccept"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/ivAcceptCall"
-                        android:layout_marginBottom="@dimen/base_margin"
-                        android:gravity="center"
-                        android:text="@string/text_accept"
-                        android:textColor="@color/action_text"
-                        android:textSize="@dimen/size_text_action" />
+                        <TextView
+                            android:id="@+id/tvAccept"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/ivAcceptCall"
+                            android:layout_marginBottom="@dimen/base_margin"
+                            android:gravity="center"
+                            android:text="@string/text_accept"
+                            android:textColor="@color/action_text"
+                            android:textSize="@dimen/size_text_action"
+                            android:visibility="visible" />
 
 
-                </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+                    </com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
