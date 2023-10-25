@@ -446,10 +446,12 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun acceptIncomingNotification(data: Bundle, isFullScreen: Boolean) {
-        clearIncomingNotification(data, true);
-        val myKM = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-        val isPhoneLocked = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && myKM.isKeyguardLocked) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN && myKM.inKeyguardRestrictedInputMode())
-        if (!isPhoneLocked) return
+        clearIncomingNotification(data, true)
+        val isFullScreen = data.getBoolean("fullScreen") ?: false
+        if (!isFullScreen) return
+//        val myKM = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+//        val isPhoneLocked = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && myKM.isKeyguardLocked) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN && myKM.inKeyguardRestrictedInputMode())
+//        if (!isPhoneLocked) return
         // Open incoming call as accepted screen if `!isFullScreen` (Lock Screen Native UI)
         Handler(Looper.getMainLooper()).postDelayed({
             try {
