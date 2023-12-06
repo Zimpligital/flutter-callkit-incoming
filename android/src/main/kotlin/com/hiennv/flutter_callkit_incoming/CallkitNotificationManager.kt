@@ -608,9 +608,11 @@ class CallkitNotificationManager(private val context: Context) {
         this.dataNotificationPermission = map
         if (Build.VERSION.SDK_INT > 32) {
             activity?.let {
-                ActivityCompat.requestPermissions(it,
-                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                        PERMISSION_NOTIFICATION_REQUEST_CODE)
+                ActivityCompat.requestPermissions(
+                    it,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    PERMISSION_NOTIFICATION_REQUEST_CODE
+                )
             }
         }
     }
@@ -619,36 +621,60 @@ class CallkitNotificationManager(private val context: Context) {
         when (requestCode) {
             PERMISSION_NOTIFICATION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() &&
-                        grantResults[0] === PackageManager.PERMISSION_GRANTED) {
+                    grantResults[0] === PackageManager.PERMISSION_GRANTED
+                ) {
                     // allow
                 } else {
                     //deny
                     activity?.let {
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.POST_NOTIFICATIONS)) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                it,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            )
+                        ) {
                             //showDialogPermissionRationale()
                             if (this.dataNotificationPermission["rationaleMessagePermission"] != null) {
-                                showDialogMessage(it, this.dataNotificationPermission["rationaleMessagePermission"] as String) { dialog, _ ->
+                                showDialogMessage(
+                                    it,
+                                    this.dataNotificationPermission["rationaleMessagePermission"] as String
+                                ) { dialog, _ ->
                                     dialog?.dismiss()
-                                    requestNotificationPermission(activity, this.dataNotificationPermission)
+                                    requestNotificationPermission(
+                                        activity,
+                                        this.dataNotificationPermission
+                                    )
                                 }
                             } else {
-                                requestNotificationPermission(activity, this.dataNotificationPermission)
+                                requestNotificationPermission(
+                                    activity,
+                                    this.dataNotificationPermission
+                                )
                             }
                         } else {
                             //Open Setting
                             if (this.dataNotificationPermission["postNotificationMessageRequired"] != null) {
-                                showDialogMessage(it, this.dataNotificationPermission["postNotificationMessageRequired"] as String) { dialog, _ ->
+                                showDialogMessage(
+                                    it,
+                                    this.dataNotificationPermission["postNotificationMessageRequired"] as String
+                                ) { dialog, _ ->
                                     dialog?.dismiss()
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                            Uri.fromParts("package", it.packageName, null))
+                                    val intent = Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", it.packageName, null)
+                                    )
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     it.startActivity(intent)
                                 }
                             } else {
-                                showDialogMessage(it, it.resources.getString(R.string.text_post_notification_message_required)) { dialog, _ ->
+                                showDialogMessage(
+                                    it,
+                                    it.resources.getString(R.string.text_post_notification_message_required)
+                                ) { dialog, _ ->
                                     dialog?.dismiss()
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                            Uri.fromParts("package", it.packageName, null))
+                                    val intent = Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", it.packageName, null)
+                                    )
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     it.startActivity(intent)
                                 }
@@ -660,13 +686,18 @@ class CallkitNotificationManager(private val context: Context) {
         }
     }
 
-    private fun showDialogMessage(activity: Activity?, message: String, okListener: DialogInterface.OnClickListener) {
+    private fun showDialogMessage(
+        activity: Activity?,
+        message: String,
+        okListener: DialogInterface.OnClickListener
+    ) {
         activity?.let {
             AlertDialog.Builder(it, R.style.DialogTheme)
-                    .setMessage(message)
-                    .setPositiveButton(android.R.string.ok, okListener)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create()
-                    .show()
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, okListener)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+                .show()
         }
     }
+}
