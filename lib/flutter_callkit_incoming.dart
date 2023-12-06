@@ -70,6 +70,14 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("muteCall", {'id': id, 'isMuted': isMuted});
   }
 
+  /// Get Callkit Mic Status (muted/unmuted).
+  /// On iOS, using Callkit(update call ui).
+  /// On Android, Nothing(only callback event listener).
+  static Future<bool> isMuted(String id) async {
+    return (await _channel.invokeMethod("isMuted", {'id': id})) as bool? ??
+        false;
+  }
+
   /// Hold an Ongoing call.
   /// On iOS, using Callkit(update the ongoing call ui).
   /// On Android, Nothing(only callback event listener).
@@ -108,6 +116,12 @@ class FlutterCallkitIncoming {
   /// On Android: return Empty
   static Future getDevicePushTokenVoIP() async {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
+  }
+
+  /// Request permisstion show notification for Android(13)
+  /// Only Android: show request permission post notification for Android 13+
+  static Future requestNotificationPermission(dynamic data) async {
+    return await _channel.invokeMethod("requestNotificationPermission", data);
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {

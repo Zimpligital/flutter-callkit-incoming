@@ -1,20 +1,31 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.*
+import android.Manifest
+import android.app.Activity
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.KEYGUARD_SERVICE
 import android.content.Context.POWER_SERVICE
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
+import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -27,6 +38,7 @@ import okhttp3.OkHttpClient
 class CallkitNotificationManager(private val context: Context) {
 
     companion object {
+        const val PERMISSION_NOTIFICATION_REQUEST_CODE = 6969
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
@@ -37,6 +49,8 @@ class CallkitNotificationManager(private val context: Context) {
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationViews: RemoteViews? = null
     private var notificationSmallViews: RemoteViews? = null
+    private var dataNotificationPermission: Map<String, Any> = HashMap()
+
     var notificationId: Int = 9696
     private var timer: CountDownTimer? = null
     private var targetLoadAvatarDefault = object : Target {
@@ -590,4 +604,69 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
 
-}
+    fun requestNotificationPermission(activity: Activity?, map: Map<String, Any>) {
+        this.dataNotificationPermission = map
+        if (Build.VERSION.SDK_INT > 32) {
+            activity?.let {
+                ActivityCompat.requestPermissions(it,
+                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                        PERMISSION_NOTIFICATION_REQUEST_CODE)
+            }
+        }
+    }
+
+    fun onRequestPermissionsResult(activity: Activity?, requestCode: Int, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_NOTIFICATION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() &&
+                        grantResults[0] === PackageManager.PERMISSION_GRANTED) {
+                    // allow
+                } else {
+                    //deny
+                    activity?.let {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.POST_NOTIFICATIONS)) {
+                            //showDialogPermissionRationale()
+                            if (this.dataNotificationPermission["rationaleMessagePermission"] != null) {
+                                showDialogMessage(it, this.dataNotificationPermission["rationaleMessagePermission"] as String) { dialog, _ ->
+                                    dialog?.dismiss()
+                                    requestNotificationPermission(activity, this.dataNotificationPermission)
+                                }
+                            } else {
+                                requestNotificationPermission(activity, this.dataNotificationPermission)
+                            }
+                        } else {
+                            //Open Setting
+                            if (this.dataNotificationPermission["postNotificationMessageRequired"] != null) {
+                                showDialogMessage(it, this.dataNotificationPermission["postNotificationMessageRequired"] as String) { dialog, _ ->
+                                    dialog?.dismiss()
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts("package", it.packageName, null))
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    it.startActivity(intent)
+                                }
+                            } else {
+                                showDialogMessage(it, it.resources.getString(R.string.text_post_notification_message_required)) { dialog, _ ->
+                                    dialog?.dismiss()
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts("package", it.packageName, null))
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    it.startActivity(intent)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showDialogMessage(activity: Activity?, message: String, okListener: DialogInterface.OnClickListener) {
+        activity?.let {
+            AlertDialog.Builder(it, R.style.DialogTheme)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, okListener)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create()
+                    .show()
+        }
+    }
