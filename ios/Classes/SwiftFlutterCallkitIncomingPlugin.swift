@@ -175,6 +175,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             result(true)
             break
         case "callConnected":
+            print("outgoingCallConnected was called")
+            stopAudioPlayer()
             guard let args = call.arguments else {
                 result(true)
                 return
