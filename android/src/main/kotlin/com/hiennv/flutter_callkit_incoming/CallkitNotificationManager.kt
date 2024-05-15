@@ -2,6 +2,7 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.app.*
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
@@ -35,6 +36,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import okhttp3.OkHttpClient
 
+
 class CallkitNotificationManager(private val context: Context) {
 
     companion object {
@@ -53,14 +55,16 @@ class CallkitNotificationManager(private val context: Context) {
 
     var notificationId: Int = 9696
     private var timer: CountDownTimer? = null
+    @SuppressLint("MissingPermission")
     private var targetLoadAvatarDefault = object : Target {
+
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
             notificationBuilder.setLargeIcon(bitmap)
 
-            try {
-                getNotificationManager().notify(notificationId, notificationBuilder.build())
-            } catch (_: Exception) {
-            }
+//            try {
+//                getNotificationManager().notify(notificationId, notificationBuilder.build())
+//            } catch (_: Exception) {
+//            }
         }
 
         override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
@@ -70,16 +74,17 @@ class CallkitNotificationManager(private val context: Context) {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private var targetLoadAvatarCustomize = object : Target {
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
             notificationViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
             notificationSmallViews?.setImageViewBitmap(R.id.ivAvatar, bitmap)
             notificationSmallViews?.setViewVisibility(R.id.ivAvatar, View.VISIBLE)
-            try {
-                getNotificationManager().notify(notificationId, notificationBuilder.build())
-            } catch (_: Exception) {
-            }
+//            try {
+//                getNotificationManager().notify(notificationId, notificationBuilder.build())
+//            } catch (_: Exception) {
+//            }
         }
 
         override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
@@ -100,6 +105,7 @@ class CallkitNotificationManager(private val context: Context) {
         wl.acquire(10000)
     }
 
+    @SuppressLint("MissingPermission")
     fun getMyActivityNotification(
         data: Bundle,
         newNotificationSmallViews: RemoteViews?,
@@ -118,20 +124,25 @@ class CallkitNotificationManager(private val context: Context) {
         )
 
         if (isAccepted) {
+            // Using channel miss call instead of incoming
+            // to disable sound and vibration if it is accepted screen.
+            notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
+            notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
             data.putBoolean("isAccept", true)
+        } else {
+            notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
+            notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
+            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
         }
 
-        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.setAutoCancel(false)
-        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
-        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(NotificationCompat.CATEGORY_CALL)
             notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
         }
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        notificationBuilder.setOngoing(true)
-        notificationBuilder.setTimeoutAfter(0)
+//        notificationBuilder.setOngoing(true)
+//        notificationBuilder.setTimeoutAfter(0)
 //        if (newNotificationSmallViews == null) {
 //            val duration = data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L)
 //            notificationBuilder.setTimeoutAfter(duration)
@@ -139,7 +150,7 @@ class CallkitNotificationManager(private val context: Context) {
 ////            notificationBuilder.setTimeoutAfter(0)
 //
 //        }
-        notificationBuilder.setOnlyAlertOnce(true)
+//        notificationBuilder.setOnlyAlertOnce(true)
         notificationBuilder.setSound(null)
         if (newNotificationSmallViews == null) {
             notificationBuilder.setFullScreenIntent(
@@ -165,7 +176,7 @@ class CallkitNotificationManager(private val context: Context) {
 //            notificationBuilder.color = Color.parseColor("#2B35AF")
 //        } catch (error: Exception) {
 //        }
-        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
+//        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
         val isCustomNotification =
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
@@ -196,7 +207,6 @@ class CallkitNotificationManager(private val context: Context) {
                     initNotificationViews(notificationSmallViews!!, data)
                 }
             }
-
 
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationSmallViews)
@@ -237,8 +247,12 @@ class CallkitNotificationManager(private val context: Context) {
             ).build()
             notificationBuilder.addAction(acceptAction)
         }
+//        val notification = notificationBuilder.build()
+//        notification.flags = Notification.FLAG_ONLY_ALERT_ONCE
+//        return notification;
         val notification = notificationBuilder.build()
-        notification.flags = Notification.FLAG_ONLY_ALERT_ONCE
+        notification.flags = Notification.FLAG_INSISTENT
+//        getNotificationManager().notify(notificationId, notification)
         return notification;
     }
 
@@ -268,10 +282,13 @@ class CallkitNotificationManager(private val context: Context) {
             R.id.tvNameCaller,
             data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
         )
-        remoteViews.setTextViewText(
-            R.id.tvNumber,
-            data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
-        )
+        val isShowCallID = data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
+        if (isShowCallID == true) {
+            remoteViews.setTextViewText(
+                R.id.tvNumber,
+                data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+            )
+        }
         remoteViews.setOnClickPendingIntent(
             R.id.llDecline,
             getDeclinePendingIntent(notificationId, data)
@@ -300,8 +317,9 @@ class CallkitNotificationManager(private val context: Context) {
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun showMissCallNotification(data: Bundle) {
-//        notificationId = data.getInt(
+//        val missedNotificationId = data.getInt(
 //            CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID,
 //            data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode() + 1
 //        )
@@ -348,10 +366,14 @@ class CallkitNotificationManager(private val context: Context) {
                 R.id.tvNameCaller,
                 data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
             )
-            notificationViews?.setTextViewText(
-                R.id.tvNumber,
-                data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
-            )
+            val isShowCallID =
+                data?.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_SHOW_CALL_ID, false)
+            if (isShowCallID == true) {
+                notificationViews?.setTextViewText(
+                    R.id.tvNumber,
+                    data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+                )
+            }
             notificationViews?.setOnClickPendingIntent(
                 R.id.llCallback,
                 getCallbackPendingIntent(notificationId, data)
@@ -432,40 +454,43 @@ class CallkitNotificationManager(private val context: Context) {
         }
         val notification = notificationBuilder.build()
         getNotificationManager().notify(notificationId, notification)
-        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                getNotificationManager().notify(notificationId, notification)
-            } catch (_: Exception) {
-            }
-        }, 1000)
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            try {
+//                getNotificationManager().notify(missedNotificationId, notification)
+//            } catch (_: Exception) {
+//            }
+//        }, 1000)
     }
 
 
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
+//        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
 //        notificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
     }
 
     fun clearMissCallNotification(data: Bundle) {
-//        notificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
+//        val missedNotificationId = data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
-        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                getNotificationManager().cancel(notificationId)
-            } catch (_: Exception) {
-            }
-        }, 1000)
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            try {
+//                getNotificationManager().cancel(notificationId)
+//            } catch (_: Exception) {
+//            }
+//        }, 1000)
     }
 
 
     fun acceptIncomingNotification(data: Bundle, isFullScreen: Boolean) {
         clearIncomingNotification(data, true)
-        val isFullScreen = data.getBoolean("fullScreen") ?: false
-        if (!isFullScreen) return
-//        val myKM = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-//        val isPhoneLocked = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && myKM.isKeyguardLocked) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN && myKM.inKeyguardRestrictedInputMode())
-//        if (!isPhoneLocked) return
+//        val isFullScreen = data.getBoolean("fullScreen") ?: false
+        if (!isFullScreen) {
+            return
+        }
+//         is isPhoneLocked not working on Moto.
+        val myKM = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+        val isPhoneLocked = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && myKM.isKeyguardLocked) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN && myKM.inKeyguardRestrictedInputMode())
+        if (!isPhoneLocked) return
         // Open incoming call as accepted screen if `!isFullScreen` (Lock Screen Native UI)
         Handler(Looper.getMainLooper()).postDelayed({
             try {
@@ -518,21 +543,25 @@ class CallkitNotificationManager(private val context: Context) {
                 val channelMissedCall = NotificationChannel(
                     NOTIFICATION_CHANNEL_ID_MISSED,
                     missedCallChannelName,
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = ""
-                    vibrationPattern = longArrayOf(0, 1000)
+                    vibrationPattern = longArrayOf(0, 0, 0, 0,0, 0, 0, 0, 0)
                     lightColor = Color.RED
-                    enableLights(true)
-                    enableVibration(true)
+                    enableLights(false)
+                    enableVibration(false)
+                    setSound(null, null)
                 }
-                channelMissedCall.importance = NotificationManager.IMPORTANCE_DEFAULT
+                channelMissedCall.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                channelMissedCall.importance = NotificationManager.IMPORTANCE_HIGH
+
                 createNotificationChannel(channelMissedCall)
             }
         }
     }
 
     private fun getAcceptPendingIntent(id: Int, data: Bundle): PendingIntent {
+        data?.putBoolean("isAccept", true)
         val intentTransparent = TransparentActivity.getIntent(
             context,
             CallkitConstants.ACTION_CALL_ACCEPT,
