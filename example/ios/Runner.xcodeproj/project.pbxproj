@@ -19,6 +19,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		E75F915D2C80611D003041F6 /* termination.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E75F915C2C80611D003041F6 /* termination.mp3 */; };
 		E7B07F2F2AA9D99400AFBC24 /* dialing.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E7B07F2E2AA9D99400AFBC24 /* dialing.mp3 */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CCDA753F77D427CD020E9977 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E282B9AB637C461D6B28043C /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		E75F915C2C80611D003041F6 /* termination.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = termination.mp3; path = ../../asset/termination.mp3; sourceTree = "<group>"; };
 		E7B07F2E2AA9D99400AFBC24 /* dialing.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = dialing.mp3; path = ../../asset/dialing.mp3; sourceTree = "<group>"; };
 		F896FEDB847BEE65006BD3A3 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -93,6 +95,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				E75F915C2C80611D003041F6 /* termination.mp3 */,
 				E7B07F2E2AA9D99400AFBC24 /* dialing.mp3 */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
@@ -233,6 +236,7 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				5AF34F492952E13B00F8FECC /* GoogleService-Info.plist in Resources */,
+				E75F915D2C80611D003041F6 /* termination.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

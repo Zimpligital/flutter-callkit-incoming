@@ -12,10 +12,8 @@ import 'entities/entities.dart';
 /// * callConnected(dynamic)
 
 class FlutterCallkitIncoming {
-  static const MethodChannel _channel =
-      MethodChannel('flutter_callkit_incoming');
-  static const EventChannel _eventChannel =
-      EventChannel('flutter_callkit_incoming_events');
+  static const MethodChannel _channel = MethodChannel('flutter_callkit_incoming');
+  static const EventChannel _eventChannel = EventChannel('flutter_callkit_incoming_events');
 
   /// Listen to event callback from [FlutterCallkitIncoming].
   ///
@@ -34,8 +32,7 @@ class FlutterCallkitIncoming {
   /// Event.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
   /// Event.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP - only iOS
   /// }
-  static Stream<CallEvent?> get onEvent =>
-      _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
+  static Stream<CallEvent?> get onEvent => _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
@@ -54,6 +51,27 @@ class FlutterCallkitIncoming {
   /// On Android, Nothing.
   static Future outgoingCallConnected(CallKitParams params) async {
     await _channel.invokeMethod("outgoingCallConnected", params.toJson());
+  }
+
+  /// playDialingSound.
+  /// On iOS, playDialingSound.
+  /// On Android, Nothing.
+  static Future playDialingSound() async {
+    await _channel.invokeMethod("playDialingSound");
+  }
+
+  /// playEndCallSound.
+  /// On iOS, playEndCallSound.
+  /// On Android, Nothing.
+  static Future playEndCallSound() async {
+    await _channel.invokeMethod("playEndCallSound");
+  }
+
+  /// stopAudioPlayer.
+  /// On iOS, stopAudioPlayer.
+  /// On Android, Nothing.
+  static Future stopAudioPlayer() async {
+    await _channel.invokeMethod("stopAudioPlayer");
   }
 
   /// Hide notification call for Android.
@@ -80,8 +98,7 @@ class FlutterCallkitIncoming {
   /// On iOS, using Callkit(update call ui).
   /// On Android, Nothing(only callback event listener).
   static Future<bool> isMuted(String id) async {
-    return (await _channel.invokeMethod("isMuted", {'id': id})) as bool? ??
-        false;
+    return (await _channel.invokeMethod("isMuted", {'id': id})) as bool? ?? false;
   }
 
   /// Hold an Ongoing call.

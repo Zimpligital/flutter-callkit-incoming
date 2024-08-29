@@ -244,6 +244,22 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
 
+                "outgoingCallConnected" -> {
+                    result.success("outgoingCallConnected OK")
+                }
+
+                "playDialingSound" -> {
+                    result.success("playDialingSound OK")
+                }
+                
+                "playEndCallSound" -> {
+                    result.success("playEndCallSound OK")
+                }
+
+                "stopAudioPlayer" -> {
+                    result.success("stopAudioPlayer OK")
+                }
+
                 "closeFullScreenCallNative" -> {
                     context?.sendBroadcast(
                         CallkitIncomingBroadcastReceiver.getCloseFullScreenCallNativeIntent(

@@ -103,6 +103,18 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "showMissCallNotification":
             result("OK")
             break
+        case "playEndCallSound":
+            result("playEndCallSound OK")
+            playSoundFileV2("termination", 0)
+            break
+        case "playDialingSound":
+            result("playDialingSound: OK")
+            playSoundFileV2("dialing", -1)
+            break
+        case "stopAudioPlayer":
+            result("stopAudioPlayer OK")
+            stopAudioPlayer()
+            break
         case "outgoingCallConnected":
             print("outgoingCallConnected was called")
             stopAudioPlayer()
@@ -504,40 +516,24 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         return mode
     }
     
-    func prepareAudioSession() -> Void {
-//        do {
-//            let session = AVAudioSession.sharedInstance()
-//            try session.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.voiceChat, options: [.mixWithOthers,.allowBluetooth])
-//            try session.setActive(true)
-//
-//        } catch {
-//            print("Issue with Audio Session prepareAudioSession")
-//        }
-    }
-
-
-    func prepareAudioPlayer() -> Void {
-
-        let audioFileName = "dialing"
+    func playSoundFileV2(_ soundName: String, _ numberOfLoops: Int) {
+//        let url = Bundle.main.url(forResource: soundName, withExtension: "mp3")!
         let audioFileExtension = "mp3"
-
-        guard let filePath = Bundle.main.path(forResource: audioFileName, ofType: audioFileExtension) else {
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: audioFileExtension) else {
             print("Audio file not found at specified path")
             return
         }
-
-        let alertSound = URL(fileURLWithPath: filePath)
-        try? audioPlayer = AVAudioPlayer(contentsOf: alertSound)
-        audioPlayer?.prepareToPlay()
+        do {
+            let sound = try AVAudioPlayer(contentsOf: url)
+            self.audioPlayer = sound
+            sound.numberOfLoops = numberOfLoops
+            sound.prepareToPlay()
+            sound.play()
+        } catch {
+            print("error loading file")
+            // couldn't load file :(
+        }
     }
-
-
-    func playAudioPlayer() -> Void {
-        audioPlayer?.volume = 1.0
-        audioPlayer?.numberOfLoops = -1
-        audioPlayer?.play()
-    }
-
 
     func pauseAudioPlayer() -> Void {
         if audioPlayer?.isPlaying ?? false {
@@ -550,12 +546,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         if audioPlayer?.isPlaying ?? false {
             audioPlayer?.stop()
         }
-    }
-
-    func resetAudioPlayer() -> Void {
-        stopAudioPlayer()
-        audioPlayer?.currentTime = 0
-        playAudioPlayer()
     }
 
     public func providerDidReset(_ provider: CXProvider) {
@@ -571,10 +561,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         // configurAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectData)
-            if (self?.data?.dialingEnable ?? false) {
-                self?.prepareAudioPlayer()
-                self?.resetAudioPlayer()
-            }
+            // if (self?.data?.dialingEnable ?? false) {
+            //     playSoundFileV2("dialing", 0)
+            // }
         }
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
@@ -617,7 +606,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         self.data?.uuid = action.callUUID.uuidString
-        stopAudioPlayer()
+//        playSoundFileV2("termination", 0)
         self.data?.uuid = action.callUUID.uuidString
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
             if(self.answerCall == nil && self.outgoingCall == nil){
