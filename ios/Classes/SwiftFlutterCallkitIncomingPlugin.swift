@@ -109,6 +109,21 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "playDialingSound":
             result("playDialingSound: OK")
+            
+            guard let callUUID = UUID(uuidString: self.data!.uuid) else {
+                stopAudioPlayer()
+                return
+            }
+            guard let call = self.callManager.callWithUUID(uuid: callUUID) else {
+                stopAudioPlayer()
+                return
+            }
+            
+            if (call.hasEnded) {
+                stopAudioPlayer()
+                return
+            }
+            
             playSoundFileV2("dialing", -1)
             break
         case "stopAudioPlayer":
@@ -606,7 +621,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         self.data?.uuid = action.callUUID.uuidString
-//        playSoundFileV2("termination", 0)
+        playSoundFileV2("termination", 0)
         self.data?.uuid = action.callUUID.uuidString
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
             if(self.answerCall == nil && self.outgoingCall == nil){
@@ -617,6 +632,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
+        stopAudioPlayer()
         call.endCall()
         self.callManager.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
