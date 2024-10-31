@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
 
 object AppUtils {
@@ -15,11 +16,22 @@ object AppUtils {
         return intent
     }
 
-    fun postApiWithoutBody(endpoint: String, userToken: String) {
+    fun postApiWithoutBody(endpoint: String, userToken: String , isCancel: Boolean = false) {
         val client = OkHttpClient()
+        // Create JSON body with the isCancel parameter
+        val jsonBody = JSONObject().apply {}
+        if (isCancel) {
+            jsonBody.put("isCancel", true)
+        }
+
+        val requestBody = RequestBody.create(
+            MediaType.parse("application/json; charset=utf-8"),
+            jsonBody.toString()
+        )
+
         val request = Request.Builder()
             .url(endpoint)
-            .post(RequestBody.create(null, ByteArray(0))) // No request body
+            .post(requestBody)
             .addHeader("Content-Type", "application/json")
             .addHeader("Authorization", "Bearer $userToken")
             .build()

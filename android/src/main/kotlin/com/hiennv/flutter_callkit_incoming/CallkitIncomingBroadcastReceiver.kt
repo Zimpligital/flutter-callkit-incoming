@@ -146,7 +146,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                             data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
                         val userToken = extra.getValue("userToken") as String
                         val cancelEndpoint = extra.getValue("cancelEndpoint") as String
-                        AppUtils.postApiWithoutBody(cancelEndpoint, userToken)
+                        AppUtils.postApiWithoutBody(cancelEndpoint, userToken, true)
                     } catch (e: Exception) {
 
                     }
