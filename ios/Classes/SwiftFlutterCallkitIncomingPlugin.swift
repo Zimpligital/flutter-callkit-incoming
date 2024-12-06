@@ -110,20 +110,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "playDialingSound":
             result("playDialingSound: OK")
             
-            guard let callUUID = UUID(uuidString: self.data!.uuid) else {
-                stopAudioPlayer()
-                return
-            }
-            guard let call = self.callManager.callWithUUID(uuid: callUUID) else {
-                stopAudioPlayer()
-                return
-            }
-            
-            if (call.hasEnded) {
-                stopAudioPlayer()
-                return
-            }
-            
+            stopAudioPlayer()
             playSoundFileV2("dialing", -1)
             break
         case "stopAudioPlayer":
@@ -621,8 +608,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         self.data?.uuid = action.callUUID.uuidString
-        playSoundFileV2("termination", 0)
-        self.data?.uuid = action.callUUID.uuidString
+        // playSoundFileV2("termination", 0)
         guard let call = self.callManager.callWithUUID(uuid: action.callUUID) else {
             if(self.answerCall == nil && self.outgoingCall == nil){
                 sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_TIMEOUT, self.data?.toJSON())
