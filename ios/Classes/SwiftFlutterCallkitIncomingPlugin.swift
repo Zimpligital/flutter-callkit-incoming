@@ -109,7 +109,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             break
         case "playDialingSound":
             result("playDialingSound: OK")
-            
+
             stopAudioPlayer()
             playSoundFileV2("dialing", -1)
             break
@@ -221,11 +221,14 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 result("OK")
                 return
             }
-
+            
             self.silenceEvents = silence
             result("OK")
             break;
         case "requestNotificationPermission":
+            result("OK")
+            break
+         case "requestFullIntentPermission":
             result("OK")
             break
         case "hideCallkitIncoming":
@@ -563,9 +566,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         // configurAudioSession()
         call.hasStartedConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, startedConnectingAt: call.connectData)
-            // if (self?.data?.dialingEnable ?? false) {
-            //     playSoundFileV2("dialing", 0)
-            // }
         }
         call.hasConnectDidChange = { [weak self] in
             self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
@@ -605,7 +605,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
     }
     
-    
+//    private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int) {
+//        if UIApplication.shared.isProtectedDataAvailable {
+//            action.fulfill()
+//        } else if counter > 180 { // fail if waiting for more then 3 minutes
+//            action.fail()
+//        } else {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                self.checkUnlockedAndFulfill(action: action, counter: counter + 1)
+//            }
+//        }
+//    }
+
+
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         self.data?.uuid = action.callUUID.uuidString
         // playSoundFileV2("termination", 0)
