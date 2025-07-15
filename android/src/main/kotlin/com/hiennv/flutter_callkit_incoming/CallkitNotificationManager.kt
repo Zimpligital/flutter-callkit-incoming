@@ -33,7 +33,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.Person
 import coil.ImageLoader
 import coil.request.ImageRequest
 import androidx.core.app.Person
@@ -84,8 +83,6 @@ class CallkitNotificationManager(
 
     private var targetOnGoingAvatarDefault: SafeTarget? = null
     private var targetOnGoingAvatarCustom: SafeTarget? = null
-
-    private var dataNotificationPermission: Map<String, Any> = HashMap()
 
 //    var notificationId: Int = 9696
 

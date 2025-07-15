@@ -11,7 +11,6 @@ import android.graphics.Color
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.os.*
-import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -19,8 +18,8 @@ import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.*
 import com.hiennv.flutter_callkit_incoming.widgets.RippleRelativeLayout
-import com.squareup.picasso.OkHttp3Downloader
-import com.squareup.picasso.Picasso
+//import com.squareup.picasso.OkHttp3Downloader
+//import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import okhttp3.OkHttpClient
 import android.view.ViewGroup.MarginLayoutParams
@@ -320,15 +319,15 @@ class CallkitIncomingActivity : Activity() {
         } catch (error: Exception) {
         }
         var backgroundUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-            val headers =
-                data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@CallkitIncomingActivity, headers)
-                .load(backgroundUrl)
-                .placeholder(R.drawable.transparent)
-                .error(R.drawable.transparent)
-                .into(ivBackground)
-        }
+//        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
+//            val headers =
+//                data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+//            getPicassoInstance(this@CallkitIncomingActivity, headers)
+//                .load(backgroundUrl)
+//                .placeholder(R.drawable.transparent)
+//                .error(R.drawable.transparent)
+//                .into(ivBackground)
+//        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ivBackground.setRenderEffect(
                 RenderEffect.createBlurEffect(
@@ -466,9 +465,6 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
         data?.putBoolean("fullScreen", true)
         data?.putBoolean("isAccept", true)
-        val acceptIntent =
-            TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
-
 
         CallkitNotificationService.startServiceWithAction(
             this@CallkitIncomingActivity,
@@ -511,7 +507,7 @@ class CallkitIncomingActivity : Activity() {
             ivMic.setImageResource(R.drawable.ic_mic_on)
             ivMic.setBackgroundResource(R.drawable.bg_action_circle)
         }
-        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(mapOf("isMuted" to isMute))
+        FlutterCallkitIncomingPlugin?.getInstance()?.sendEventCustom(mapOf("isMuted" to isMute))
     }
 
     private fun onSpeakerClick() {
@@ -527,7 +523,7 @@ class CallkitIncomingActivity : Activity() {
             val padding = resources.getDimensionPixelOffset(R.dimen.call_action_v2)
             ivSpeaker.setPadding(padding, padding, padding, padding)
         }
-        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(mapOf("isSpeaker" to isSpeaker))
+        FlutterCallkitIncomingPlugin?.getInstance()?.sendEventCustom(mapOf("isSpeaker" to isSpeaker))
     }
 
     private fun onVideoClick() {
@@ -540,7 +536,7 @@ class CallkitIncomingActivity : Activity() {
             ivVideo.setBackgroundResource(R.drawable.bg_action_circle)
         }
         val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
-        FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(mapOf("isVideo" to isVideo))
+        FlutterCallkitIncomingPlugin?.getInstance()?.sendEventCustom(mapOf("isVideo" to isVideo))
 
         val acceptIntent: Intent? = AppUtils.getAppIntent(this@CallkitIncomingActivity, data = data)
         startActivity(acceptIntent)

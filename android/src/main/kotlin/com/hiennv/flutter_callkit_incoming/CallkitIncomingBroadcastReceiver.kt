@@ -87,10 +87,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         fun getCloseFullScreenCallNativeIntent(context: Context): Intent {
             return Intent("${context.packageName}.${CallkitIncomingActivity.ACTION_CLOSE_FULL_SCREEN_CALL_NATIVE}")
         }
-            Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
-                action = "${context.packageName}.${CallkitConstants.ACTION_CALL_UNHELD}"
-                putExtra(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA, data)
-            }
 
         fun getIntentConnected(context: Context, data: Bundle?) =
             Intent(context, CallkitIncomingBroadcastReceiver::class.java).apply {
@@ -109,8 +105,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         when (action) {
             "${context.packageName}.${CallkitConstants.ACTION_CALL_INCOMING}" -> {
                 try {
-                    val isAccepted = data.getBoolean("isAccept")
-                    callkitNotificationManager?.showIncomingNotification(data, isAccepted)
+//                    val isAccepted = data.getBoolean("isAccept")
+                    callkitNotificationManager?.showIncomingNotification(data)
                     sendEventFlutter(CallkitConstants.ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -143,8 +139,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     )
                     sendEventFlutter(CallkitConstants.ACTION_CALL_ACCEPT, data)
 //                    context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    val isFullScreen = data.getBoolean("fullScreen")
-                    callkitNotificationManager.acceptIncomingNotification(data, isFullScreen)
+//                    val isFullScreen = data.getBoolean("fullScreen")
+//                    callkitNotificationManager.acceptIncomingNotification(data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     Log.e(TAG, null, error)
