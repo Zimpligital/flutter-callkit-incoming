@@ -849,7 +849,7 @@ class CallkitNotificationManager(
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
         callkitSoundPlayerManager?.stop()
 
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded(context, isAccepted))
+        context.sendBroadcast(CallkitIncomingActivity.getIntentTimeout(context, isAccepted))
         val notificationId =
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
@@ -989,7 +989,7 @@ class CallkitNotificationManager(
 
 
     private fun getHangupPendingIntent(notificationId: Int, data: Bundle): PendingIntent {
-        val endedIntent = CallkitIncomingBroadcastReceiver.getIntentEnded(context, data)
+        val endedIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
         return PendingIntent.getBroadcast(
             context, notificationId, endedIntent, getFlagPendingIntent()
         )
