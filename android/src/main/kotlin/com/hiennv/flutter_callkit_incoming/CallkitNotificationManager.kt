@@ -29,6 +29,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
 import androidx.core.content.ContextCompat.getSystemService
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.OkHttp3Downloader
@@ -141,16 +142,15 @@ class CallkitNotificationManager(private val context: Context) {
             notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
         }
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//        notificationBuilder.setOngoing(true)
-//        notificationBuilder.setTimeoutAfter(0)
-//        if (newNotificationSmallViews == null) {
-//            val duration = data.getLong(CallkitConstants.EXTRA_CALLKIT_DURATION, 0L)
-//            notificationBuilder.setTimeoutAfter(duration)
-//        } else {
-////            notificationBuilder.setTimeoutAfter(0)
-//
-//        }
-//        notificationBuilder.setOnlyAlertOnce(true)
+        notificationBuilder.setOngoing(true) // true is call notification non-dismissible notifications
+        notificationBuilder.setWhen(0)
+        notificationBuilder.setTimeoutAfter(
+            data.getLong(
+                CallkitConstants.EXTRA_CALLKIT_DURATION,
+                0L
+            )
+        )
+        notificationBuilder.setOnlyAlertOnce(true)
         notificationBuilder.setSound(null)
         if (newNotificationSmallViews == null) {
             notificationBuilder.setFullScreenIntent(
@@ -207,12 +207,35 @@ class CallkitNotificationManager(private val context: Context) {
                     initNotificationViews(notificationSmallViews!!, data)
                 }
             }
-
-            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val person = Person.Builder()
+                    .setName(caller)
+                    .setImportant(true)
+                    .setBot(false)
+                    .build()
+                notificationBuilder.setStyle(
+                    NotificationCompat.CallStyle.forIncomingCall(
+                        person,
+                        getDeclinePendingIntent(notificationId, data),
+                        getAcceptPendingIntent(notificationId, data),
+                    )
+                        .setIsVideo(typeCall > 0)
+                )
+            } else {
+                 notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            }
+           
             notificationBuilder.setCustomContentView(notificationSmallViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationSmallViews)
         } else {
+            notificationBuilder.setContentText(
+                data.getString(
+                    CallkitConstants.EXTRA_CALLKIT_HANDLE,
+                    ""
+                )
+            )
             val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
             if (avatarUrl != null && avatarUrl.isNotEmpty()) {
                 val headers =
@@ -220,32 +243,39 @@ class CallkitNotificationManager(private val context: Context) {
                 getPicassoInstance(context, headers).load(avatarUrl)
                     .into(targetLoadAvatarDefault)
             }
-            notificationBuilder.setContentTitle(
-                data.getString(
-                    CallkitConstants.EXTRA_CALLKIT_NAME_CALLER,
-                    ""
+            val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val person = Person.Builder()
+                    .setName(caller)
+                    .setImportant(true)
+                    .setBot(false)
+                    .build()
+                notificationBuilder.setStyle(
+                    NotificationCompat.CallStyle.forIncomingCall(
+                        person,
+                        getDeclinePendingIntent(notificationId, data),
+                        getAcceptPendingIntent(notificationId, data),
+                    )
+                        .setIsVideo(typeCall > 0)
                 )
-            )
-            notificationBuilder.setContentText(
-                data.getString(
-                    CallkitConstants.EXTRA_CALLKIT_HANDLE,
-                    ""
-                )
-            )
-            val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
-            val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                R.drawable.ic_decline,
-                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
-                getDeclinePendingIntent(notificationId, data)
-            ).build()
-            notificationBuilder.addAction(declineAction)
-            val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
-            val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-                R.drawable.ic_accept,
-                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
-                getAcceptPendingIntent(notificationId, data)
-            ).build()
-            notificationBuilder.addAction(acceptAction)
+            } else {
+                notificationBuilder.setContentTitle(caller)
+                val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+                val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                    R.drawable.ic_decline,
+                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
+                    getDeclinePendingIntent(notificationId, data)
+                ).build()
+                notificationBuilder.addAction(declineAction)
+                val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
+                val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                    R.drawable.ic_accept,
+                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                    getAcceptPendingIntent(notificationId, data)
+                ).build()
+                notificationBuilder.addAction(acceptAction)
+            }
+            
         }
 //        val notification = notificationBuilder.build()
 //        notification.flags = Notification.FLAG_ONLY_ALERT_ONCE

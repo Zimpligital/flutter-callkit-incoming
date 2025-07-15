@@ -69,7 +69,8 @@ class CallkitIncomingActivity : Activity() {
 
     inner class CloseFullScreenCallNativeBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            onDeclineClick()
+//            onDeclineClick()
+            finishTask()
         }
     }
 

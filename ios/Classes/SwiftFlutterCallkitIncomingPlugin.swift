@@ -581,28 +581,31 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             action.fail()
             return
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-            // self.configurAudioSession()
-        }
-        call.hasConnectDidChange = { [weak self] in
-            self?.stopAudioPlayer()
-            self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+//            // self.configurAudioSession()
+//        }
+//        call.hasConnectDidChange = { [weak self] in
+//            self?.stopAudioPlayer()
+//            self?.sharedProvider?.reportOutgoingCall(with: call.uuid, connectedAt: call.connectedData)
+//        }
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
 
-        let microphonePermissionStatus = AVCaptureDevice.authorizationStatus(for: .audio)
-        if (microphonePermissionStatus != .authorized) {
-            let now = Date()
-            let futureDate = now.addingTimeInterval(86400)
-            action.fulfill(withDateConnected: futureDate)
-        }
-
-        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-            appDelegate.onAccept(call, action)
-        }else {
-            action.fulfill()
-        }
+//        let microphonePermissionStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+//        if (microphonePermissionStatus != .authorized) {
+//            let now = Date()
+//            let futureDate = now.addingTimeInterval(86400)
+//            action.fulfill(withDateConnected: futureDate)
+//        }
+//
+//        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
+//            appDelegate.onAccept(call, action)
+//        }else {
+//            action.fulfill()
+//        }
+        let now = Date()
+        let futureDate = now.addingTimeInterval(5)
+        action.fulfill(withDateConnected: futureDate)
     }
     
     
