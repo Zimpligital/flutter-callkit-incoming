@@ -21,6 +21,7 @@
 
     <dimen name="size_text_name">24sp</dimen>
     <dimen name="size_text_action">14sp</dimen>
+    <dimen name="size_text_sub">12sp</dimen>
 
     <dimen name="call_action_v1">16sp</dimen>
     <dimen name="call_action_v2">18sp</dimen>
