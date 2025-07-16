@@ -1010,7 +1010,7 @@ class CallkitNotificationManager(
 
     @SuppressLint("MissingPermission")
     fun showIncomingNotification(data: Bundle) {
-
+        forceWakeLock()
         if (incomingChannelEnabled()) {
             callkitSoundPlayerManager?.play(data)
         }

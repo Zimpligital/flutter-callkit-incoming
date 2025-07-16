@@ -635,15 +635,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         self.data?.isAccepted = true
         self.answerCall = call
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-        if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
-            appDelegate.onAccept(call, action)
-        }else {
-            action.fulfill()
-        }
+//         if let appDelegate = UIApplication.shared.delegate as? CallkitIncomingAppDelegate {
+//             appDelegate.onAccept(call, action)
+//         }else {
+//             action.fulfill()
+//         }
 
-//         let now = Date()
-//         let futureDate = now.addingTimeInterval(5)
-//         action.fulfill(withDateConnected: futureDate)
+        let now = Date()
+        let futureDate = now.addingTimeInterval(5)
+        action.fulfill(withDateConnected: futureDate)
     }
     
 //    private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int) {
