@@ -319,15 +319,17 @@ class CallkitIncomingActivity : Activity() {
         } catch (error: Exception) {
         }
         var backgroundUrl = data?.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
-//        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-//            val headers =
-//                data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+        if (!backgroundUrl.isNullOrEmpty()) {
+            val headers =
+                data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            ImageLoaderProvider.loadImage(this@CallkitIncomingActivity, backgroundUrl, headers, R.drawable.transparent, ivBackground)
+//            val headers = data?.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
 //            getPicassoInstance(this@CallkitIncomingActivity, headers)
 //                .load(backgroundUrl)
 //                .placeholder(R.drawable.transparent)
 //                .error(R.drawable.transparent)
 //                .into(ivBackground)
-//        }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ivBackground.setRenderEffect(
                 RenderEffect.createBlurEffect(

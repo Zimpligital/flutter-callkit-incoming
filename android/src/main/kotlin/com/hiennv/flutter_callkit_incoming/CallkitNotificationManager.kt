@@ -849,7 +849,7 @@ class CallkitNotificationManager(
     fun clearIncomingNotification(data: Bundle, isAccepted: Boolean) {
         callkitSoundPlayerManager?.stop()
 
-        context.sendBroadcast(CallkitIncomingActivity.getIntentTimeout(context, isAccepted))
+//        context.sendBroadcast(CallkitIncomingBroadcastReceiver.getIntentTimeout(this@CallkitIncomingActivity, data))
         val notificationId =
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         getNotificationManager().cancel(notificationId)
