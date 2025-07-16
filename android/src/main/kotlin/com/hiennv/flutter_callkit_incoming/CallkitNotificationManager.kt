@@ -989,7 +989,7 @@ class CallkitNotificationManager(
 
 
     private fun getHangupPendingIntent(notificationId: Int, data: Bundle): PendingIntent {
-        val endedIntent = CallkitIncomingBroadcastReceiver.getIntentTimeout(context, data)
+        val endedIntent = CallkitIncomingBroadcastReceiver.getIntentEnded(context, data)
         return PendingIntent.getBroadcast(
             context, notificationId, endedIntent, getFlagPendingIntent()
         )

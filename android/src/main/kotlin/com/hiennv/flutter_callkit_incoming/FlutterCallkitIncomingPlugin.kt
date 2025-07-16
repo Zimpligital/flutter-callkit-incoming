@@ -247,7 +247,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     if (currentCall != null && context != null) {
                         if(currentCall.isAccepted) {
                             context?.sendBroadcast(
-                                CallkitIncomingBroadcastReceiver.getIntentTimeout(
+                                CallkitIncomingBroadcastReceiver.getIntentEnded(
                                     requireNotNull(context),
                                     currentCall.toBundle()
                                 )
@@ -315,7 +315,7 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     calls.forEach {
                         if (it.isAccepted) {
                             context?.sendBroadcast(
-                                CallkitIncomingBroadcastReceiver.getIntentTimeout(
+                                CallkitIncomingBroadcastReceiver.getIntentEnded(
                                     requireNotNull(context),
                                     it.toBundle()
                                 )
