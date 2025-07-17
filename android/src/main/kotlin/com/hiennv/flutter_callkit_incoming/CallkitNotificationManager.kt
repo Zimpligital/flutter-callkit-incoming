@@ -497,7 +497,7 @@ class CallkitNotificationManager(private val context: Context) {
                 try {
                     showIncomingNotification(data!!, true)
                 } catch (error: Exception) {
-                    result.error("error", error.message, "")
+                    Log.e("native", null, error)
                 }
             }
 
