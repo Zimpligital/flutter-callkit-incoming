@@ -493,11 +493,14 @@ class CallkitNotificationManager(private val context: Context) {
         // is isPhoneLocked not working on Moto.
             val myKM = context.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
             val isPhoneLocked = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && myKM.isKeyguardLocked) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN && myKM.inKeyguardRestrictedInputMode())
-            if (!isPhoneLocked) return
-            try {
-                showIncomingNotification(data!!, true)
-            } catch (_: Exception) {
+            if (isPhoneLocked) {
+                try {
+                    showIncomingNotification(data!!, true)
+                } catch (error: Exception) {
+                    result.error("error", error.message, "")
+                }
             }
+
         }, 200)
     }
 
