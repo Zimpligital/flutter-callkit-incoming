@@ -39,6 +39,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var data: Data?
     private var isFromPushKit: Bool = false
     private var silenceEvents: Bool = false
+    private var audioPlayer: AVAudioPlayer?
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
 
     
@@ -113,6 +114,19 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 self.showMissedCallNotification(data!)
             }
             result(true)
+            break
+        case "playEndCallSound":
+            result("playEndCallSound OK")
+            playSoundFileV2("termination", 0)
+            break
+        case "playDialingSound":
+            result("playDialingSound OK")
+            stopAudioPlayer()
+            playSoundFileV2("dialing", -1)
+            break
+        case "stopAudioPlayer":
+            result("stopAudioPlayer OK")
+            stopAudioPlayer()
             break
         case "startCall":
             guard let args = call.arguments else {
@@ -505,6 +519,28 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: self, userInfo: userInfo)
     }
     
+    func playSoundFileV2(_ soundName: String, _ numberOfLoops: Int) {
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
+            print("Audio file not found at specified path")
+            return
+        }
+        do {
+            let sound = try AVAudioPlayer(contentsOf: url)
+            self.audioPlayer = sound
+            sound.numberOfLoops = numberOfLoops
+            sound.prepareToPlay()
+            sound.play()
+        } catch {
+            print("error loading file")
+        }
+    }
+
+    func stopAudioPlayer() {
+        if audioPlayer?.isPlaying ?? false {
+            audioPlayer?.stop()
+        }
+    }
+
     func configureAudioSession(){
         if data?.configureAudioSession != false {
             let session = AVAudioSession.sharedInstance()

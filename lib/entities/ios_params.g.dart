@@ -24,6 +24,7 @@ IOSParams _$IOSParamsFromJson(Map<String, dynamic> json) => IOSParams(
       supportsGrouping: json['supportsGrouping'] as bool?,
       supportsUngrouping: json['supportsUngrouping'] as bool?,
       ringtonePath: json['ringtonePath'] as String?,
+      dialingEnable: json['dialingEnable'] as bool?,
     );
 
 Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
@@ -43,5 +44,6 @@ Map<String, dynamic> _$IOSParamsToJson(IOSParams instance) => <String, dynamic>{
       'supportsHolding': instance.supportsHolding,
       'supportsGrouping': instance.supportsGrouping,
       'supportsUngrouping': instance.supportsUngrouping,
+      'dialingEnable': instance.dialingEnable,
       'ringtonePath': instance.ringtonePath,
     };

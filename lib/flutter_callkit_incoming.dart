@@ -55,6 +55,24 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("hideCallkitIncoming", params.toJson());
   }
 
+  /// Play dialing sound.
+  /// Only iOS.
+  static Future playDialingSound() async {
+    await _channel.invokeMethod("playDialingSound");
+  }
+
+  /// Play end call sound.
+  /// Only iOS.
+  static Future playEndCallSound() async {
+    await _channel.invokeMethod("playEndCallSound");
+  }
+
+  /// Stop audio player.
+  /// Only iOS.
+  static Future stopAudioPlayer() async {
+    await _channel.invokeMethod("stopAudioPlayer");
+  }
+
   /// Start an Outgoing call.
   /// On iOS, using Callkit(create a history into the Phone app).
   /// On Android, Nothing(only callback event listener).
