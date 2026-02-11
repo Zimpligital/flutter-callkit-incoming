@@ -13,3 +13,7 @@ example/pubspec.lock
 
 .idea/*
 
+.claude/settings.local.json
+
+# FVM Version Cache
+.fvm/
